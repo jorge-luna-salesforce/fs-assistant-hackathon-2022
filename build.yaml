@@ -1,0 +1,24 @@
+steps:
+  - name: gcr.io/cloud-builder/docker
+    args:
+      - build
+      - "-t"
+      - gcr.io/$PROJECT_ID/fs-assistant-slackbot
+      - "/."
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - gcr.io/$PROJECT_ID/fs-assistant-slackbot
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    args:
+      - app
+      - deploy
+      - deploy.yaml
+      - "--version"
+      - ${_VERSION_NAME}
+      - "--image-url"
+      - gcr.io/$PROJECT_ID/fs-assistant-slackbot:latest
+    entryopint: gcloud
+images:
+  - gcr.io/$PROJECT_ID/luvseats_charts
+timeout: 1800s
