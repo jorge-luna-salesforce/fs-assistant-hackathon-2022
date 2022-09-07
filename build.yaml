@@ -5,7 +5,7 @@ steps:
     env:
       - "SLACK_SIGNING_SECRET=${_SLACK_SIGNING_SECRET}"
       - "SLACK_BOT_TOKEN=${_SLACK_BOT_TOKEN}"
-      - "SLACK_APP_TOKEN-${_SLACK_APP_TOKEN}"
+      - "SLACK_APP_TOKEN=${_SLACK_APP_TOKEN}"
 
   - name: gcr.io/cloud-builders/docker
     args:
