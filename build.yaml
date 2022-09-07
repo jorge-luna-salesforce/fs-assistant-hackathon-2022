@@ -26,5 +26,5 @@ steps:
       - gcr.io/$PROJECT_ID/fs-assistant-slackbot:latest
     entrypoint: gcloud
 images:
-  - gcr.io/$PROJECT_ID/luvseats_charts
+  - gcr.io/$PROJECT_ID/fs-assistant-slackbot
 timeout: 1800s
