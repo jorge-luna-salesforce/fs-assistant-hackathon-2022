@@ -3,6 +3,7 @@ const { App, ExpressReceiver } = require("@slack/bolt");
 const bodyParser = require("body-parser");
 
 const FS_ASSISTANT_CHANNEL = "C040SH1GX5Z";
+const TWILIO_NUMBER = "+13157582817";
 
 const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_SECRET });
 receiver.router.use(bodyParser.json());
@@ -16,20 +17,33 @@ const app = new App({
   port: process.env.PORT || 3000
 });
 
+const twilioClient = new require("twilio")(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
 receiver.router.get("/ping", (req, res) => {
   res.writeHead(200);
   res.end("Pong!");
 });
 
 receiver.router.post("/schedule-wo", (req, res) => {
+  const to = req.body.to;
+  const body = req.body.msg;
+
   app.client.chat.postMessage({
-    text: "API Call received with data => " + req.body.data,
+    text: "API Call received to => " + to + " with msg => " + body + " Sending to SMS!!!",
     channel: FS_ASSISTANT_CHANNEL
   });
 
   res.writeHead(200);
   res.end("ok!");
 });
+
+twilioClient.messages
+  .create({
+    body,
+    to,
+    from: TWILIO_NUMBER
+  })
+  .then((message) => console.log(message.sid));
 
 // Listens to incoming messages that contain "hello"
 app.message("hello", async ({ message, say }) => {
