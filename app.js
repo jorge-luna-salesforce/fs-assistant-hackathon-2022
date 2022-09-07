@@ -36,11 +36,23 @@ async function StartServer() {
   });
 
   receiver.router.post("/schedule-wo", async (req, res) => {
-    const to = req.body.to;
-    const body = req.body.msg;
+    if (req.body.length < 1) {
+      req.log.error("Invalid request received!");
+      res.writeHead(400);
+      res.end("Invalid Request");
+      return;
+    }
+
+    const message = req.body[0];
+    const to = message.phoneNumber;
+    const body = `Appointment scheduled for ph#: ${message.phoneNumber} \n
+                  Description: ${message.appointment.subject}\n
+                  Starting at:${message.appointment.startTime} - Ending at: ${message.appointment.endTime}\n
+                  Address: ${message.appointment.address.street} - ${message.appointment.address.city} - ${message.appointment.address.state} - ${message.appointment.address.postalCode} - ${message.appointment.address.country}\n
+                  Appointment Id: ${message.appointment.appointmentId}`;
 
     app.client.chat.postMessage({
-      text: "API Call received to => " + to + " with msg => " + body + " Sending to SMS!!!",
+      text: body,
       channel: FS_ASSISTANT_CHANNEL
     });
 
