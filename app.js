@@ -33,17 +33,17 @@ receiver.router.post("/schedule-wo", (req, res) => {
     channel: FS_ASSISTANT_CHANNEL
   });
 
+  twilioClient.messages
+    .create({
+      body,
+      to,
+      from: TWILIO_NUMBER
+    })
+    .then((message) => console.log(message.sid));
+
   res.writeHead(200);
   res.end("ok!");
 });
-
-twilioClient.messages
-  .create({
-    body,
-    to,
-    from: TWILIO_NUMBER
-  })
-  .then((message) => console.log(message.sid));
 
 // Listens to incoming messages that contain "hello"
 app.message("hello", async ({ message, say }) => {
