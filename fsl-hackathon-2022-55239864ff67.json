@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "fsl-hackathon-2022",
+  "private_key_id": "55239864ff67a2836873ca76836af7e43870f6c5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCwcyFGfHOzH8DQ\nzX0NIHl/zgFjYxE1NkT32fyIP1m79PEJEMfbRYJesUmGDdRwMeMtrhJNXQ/lCFzT\n/BZxbOh9tSnvQO93xolYMzipbAS52eMVMvveQDpDuOJMlgRzZbCrmdHIDUgquRp2\nl/1pGGmlIfYbtDCHLGlLoA0T5DhQbybgNVvyGKJ6y/ElmOx4GdCkkMBstFjDMV9v\nPngjxCI5BLjIX/RRADXI2MVIS61UjG4HJ2Yv+0CoST3fIgde+dwMiTXNyfBA2yL/\nYZyTl9KGv00X3vKl5j9h2B00G1uo9RXJNe4yeC6GieyZrynDlduFqS/3evrmRVNV\nMhCTN7zbAgMBAAECggEAK/jE9hfVjXIATwimfTr2jE7+MZJim2wmy81bDWkcJ6bm\n2meAJrivwIFV3T5dDoigIKYckYL7jwwCdiGARkvptEoNZT49bw/e8kfxeuccVmRi\nHspR0hUXcAEHBCbufQN+f4UZrk0BCwSN/7fowuP+j9RizIye+1Cp/Nqp56ccEY72\nZFtyfoHefL+Itxx/c9X4Rv2QWCbAfPEu1DS64zGcRK7eV4Y3kjJuPf9fSvoGgT1J\nNUefo+ka91divhHuAW1EO/v9eTqjD/0mz7K0H7nqn50kanp0meRyCoU5KhTe3Ryl\nq9fLURtVan47dpAD5w9ckpC8X78eLypDyNsKeseFYQKBgQD38wkILpFNIP1QTZm5\n581ybQgIvmt0MTmz1NN9lYROVAp8wqcgi9nEYjTtsvcI3BhTv2825JTWut6M0yWT\n0NC7YHsrhIoalwq0u/qnUMwIPBzKr85WY3xhG/DNQdaZYLRFhWYSz2Pq6WEiWY6o\nWrHCNcUtkckl5Oulrzx3PZHhBwKBgQC2Lcl4CS55LHGveU1n2kLF9/25aNQTGP6y\nOj6aIDRsyAYpnTGpkTQ62Jn6aDq5fHgz0jVhVev68XSQu+izNHMmK4S03vkK+qE8\nt79t2w9Xx3jgdgByz1gwLJWu4i+NRUBUvXzbT2mu7QsaTf3bZbR0EextesT82JbD\nezeRmBPUjQKBgQCW8byI35iTRMcRkPxJ4aT/yQKAGDRgOutu39yUcmZmLOFpjDKk\nLJ8437RrFG0xVpP0v/DbkRJPGtoLDyusLg40VAsHthtBDrx0xI9WNmjPhpDcj2Rk\n0RHSKGlS+4bCPs3gGNLIFrs0Mjlw6OZg9T2MBqHwGPVEfXU7m0+LI89gFwKBgQCg\nCmcz2TUHZEDW+0RB2J7SVUKC8BFmWY3eOoamVWZYrfuj8SEgqpvsmj3imlAEhNEA\nDUmxoY62HAnf4APT8l66CH8DeeHkgDrHIVC9DDVVUrngzikksvvxDinMwY0umMij\n6PbXntLjxf/78snxRE6brOc7Yh/NU+RWBFfTwnqhPQKBgCzKrUlWcEmNtTWvK5TU\nejBvljqqkN1jCw2lOtM3VE1kZn6emN0v4EdsNtulEMkYqUK5lcHh7iK9o65QN2l0\njIOQ1Ykrpcji+G14e6bMUlaAWWfI8SxPQYvYnFTArD7v2TE/7z9ar+rxyVt89YyC\nte5jiYYdgV9I++oxiVp/KHYu\n-----END PRIVATE KEY-----\n",
+  "client_email": "fsl-hackathon-2022@appspot.gserviceaccount.com",
+  "client_id": "105793164805614671958",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fsl-hackathon-2022%40appspot.gserviceaccount.com"
+}
