@@ -1,4 +1,12 @@
 steps:
+  - name: node
+    entrypoint: npm
+    args: ["run", "create-env"]
+    env:
+      - "SLACK_SIGNING_SECRET=${_SLACK_SIGNING_SECRET}"
+      - "SLACK_BOT_TOKEN=${_SLACK_BOT_TOKEN}"
+      - "SLACK_APP_TOKEN-${_SLACK_APP_TOKEN}"
+
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -16,10 +24,6 @@ steps:
       - deploy.yaml
       - "--version"
       - ${_VERSION_NAME}
-      - "--set-env-vars"
-      - "SLACK_SIGNING_SECRET=${_SLACK_SIGNING_SECRET}"
-      - "SLACK_BOT_TOKEN=${_SLACK_BOT_TOKEN}"
-      - "SLACK_APP_TOKEN-${_SLACK_APP_TOKEN}"
       - "--image-url"
       - gcr.io/$PROJECT_ID/fs-assistant-slackbot:latest
     entrypoint: gcloud
