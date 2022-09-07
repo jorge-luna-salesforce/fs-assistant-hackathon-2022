@@ -41,15 +41,21 @@ async function StartServer() {
       channel: FS_ASSISTANT_CHANNEL
     });
 
-    const responseTwilio = await twilioClient.messages.create({
-      to,
-      body,
-      from: TWILIO_NUMBER
-    });
+    try {
+      const responseTwilio = await twilioClient.messages.create({
+        to,
+        body,
+        from: TWILIO_NUMBER
+      });
 
-    req.log.info("Twilio message sent", responseTwilio);
-    res.writeHead(200);
-    res.end("ok!");
+      req.log.info("Twilio message sent", responseTwilio);
+      res.writeHead(200);
+      res.end("ok!");
+    } catch (error) {
+      req.log.error("Error sending to Twilio", error);
+      res.writeHead(400);
+      res.end("Error sending message");
+    }
   });
 
   receiver.router.post("/reply", (req, res) => {
