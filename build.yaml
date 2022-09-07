@@ -16,9 +16,13 @@ steps:
       - deploy.yaml
       - "--version"
       - ${_VERSION_NAME}
+      - "--set-env-vars"
+      - "SLACK_SIGNING_SECRET=${_SLACK_SIGNING_SECRET}"
+      - "SLACK_BOT_TOKEN=${_SLACK_BOT_TOKEN}"
+      - "SLACK_APP_TOKEN-${_SLACK_APP_TOKEN}"
       - "--image-url"
       - gcr.io/$PROJECT_ID/fs-assistant-slackbot:latest
-    entryopint: gcloud
+    entrypoint: gcloud
 images:
   - gcr.io/$PROJECT_ID/luvseats_charts
 timeout: 1800s
