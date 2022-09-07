@@ -1,5 +1,5 @@
 runtime: nodejs
-service: fs-assistant-slackbot
+service: default
 env: flex
 
 manual_scaling:
