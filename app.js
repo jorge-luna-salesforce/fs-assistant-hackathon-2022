@@ -45,7 +45,8 @@ async function StartServer() {
 
     const message = req.body[0];
     const to = message.phoneNumber;
-    const body = `Appointment scheduled for ph#: ${message.phoneNumber} \n
+    const body = `>Appointment scheduled for : ${message.name} \n
+                  Phone #: ${message.phoneNumber}\n
                   Description: ${message.appointment.subject}\n
                   Starting at:${message.appointment.startTime} - Ending at: ${message.appointment.endTime}\n
                   Address: ${message.appointment.address.street} - ${message.appointment.address.city} - ${message.appointment.address.state} - ${message.appointment.address.postalCode} - ${message.appointment.address.country}\n
