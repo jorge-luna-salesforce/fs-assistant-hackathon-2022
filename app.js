@@ -32,7 +32,7 @@ async function StartServer() {
     res.end("Pong!");
   });
 
-  receiver.router.post("/schedule-wo", (req, res) => {
+  receiver.router.post("/schedule-wo", async (req, res) => {
     const to = req.body.to;
     const body = req.body.msg;
 
@@ -41,14 +41,13 @@ async function StartServer() {
       channel: FS_ASSISTANT_CHANNEL
     });
 
-    twilioClient.messages
-      .create({
-        body,
-        to,
-        from: TWILIO_NUMBER
-      })
-      .then((message) => req.log.info("Twilio message sent", message));
+    const message = await twilioClient.messages.create(to, {
+      from: TWILIO_NUMBER
+    });
 
+    const retValue = message.say(body);
+
+    req.log.info("Twilio message sent", retValue);
     res.writeHead(200);
     res.end("ok!");
   });
