@@ -22,8 +22,6 @@ steps:
       - app
       - deploy
       - deploy.yaml
-      - "--version"
-      - ${_VERSION_NAME}
       - "--image-url"
       - gcr.io/$PROJECT_ID/fs-assistant-slackbot:latest
     entrypoint: gcloud
