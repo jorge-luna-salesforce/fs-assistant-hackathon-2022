@@ -1,7 +1,6 @@
 require("dotenv").config();
 const { App, ExpressReceiver } = require("@slack/bolt");
 const bodyParser = require("body-parser");
-const express = require("express");
 
 const FS_ASSISTANT_CHANNEL = "C040SH1GX5Z";
 
