@@ -22,9 +22,8 @@ receiver.router.get("/ping", (req, res) => {
 });
 
 receiver.router.post("/schedule-wo", (req, res) => {
-  app.client.chat.command({
-    text: "text 5145182665 " + req.body.data,
-    command: "/heymarket",
+  app.client.chat.postMessage({
+    text: "API Call received with data => " + req.body.data,
     channel: FS_ASSISTANT_CHANNEL
   });
 
