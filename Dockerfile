@@ -3,4 +3,6 @@ WORKDIR /usr/src/app
 COPY ./package.json ./
 RUN npm install
 COPY ./*.js ./
-RUN npm run start
+
+# Run the node service on container startup
+CMD [ "npm",  "start"]
