@@ -9,12 +9,18 @@ const TWILIO_NUMBER = "+13157582817";
 async function StartServer() {
   const { logger, mw } = await logBunyan.express.middleware({
     logName: "fs-slack-assistant",
-    projectId: process.env.NODE_ENV === "production" ? undefined : "fsl-hackathon-2022",
-    keyFilename: process.env.NODE_ENV === "production" ? undefined : "key/fsl-hackathon-2022-639f41b28317.json",
-    redirectToStdout: true
+    projectId:
+      process.env.NODE_ENV === "production" ? undefined : "fsl-hackathon-2022",
+    keyFilename:
+      process.env.NODE_ENV === "production"
+        ? undefined
+        : "key/fsl-hackathon-2022-639f41b28317.json",
+    redirectToStdout: true,
   });
 
-  const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_SECRET });
+  const receiver = new ExpressReceiver({
+    signingSecret: process.env.SLACK_SIGNING_SECRET,
+  });
   receiver.router.use(bodyParser.json());
   receiver.router.use(bodyParser.urlencoded({ extended: true }));
   receiver.router.use(mw);
@@ -24,10 +30,13 @@ async function StartServer() {
     token: process.env.SLACK_BOT_TOKEN,
     signingSecret: process.env.SLACK_SIGNING_SECRET,
     appToken: process.env.SLACK_APP_TOKEN,
-    port: process.env.PORT || 3000
+    port: process.env.PORT || 3000,
   });
 
-  const twilioClient = new require("twilio")(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  const twilioClient = new require("twilio")(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_AUTH_TOKEN
+  );
 
   receiver.router.get("/ping", (req, res) => {
     req.log.info("Ping Request Received");
@@ -52,16 +61,60 @@ async function StartServer() {
                   Address: ${message.appointment.address.street} - ${message.appointment.address.city} - ${message.appointment.address.state} - ${message.appointment.address.postalCode} - ${message.appointment.address.country}\n
                   Appointment Id: ${message.appointment.appointmentId}`;
 
-    app.client.chat.postMessage({
+    const postMessageResponse = await app.client.chat.postMessage({
       text: body,
-      channel: FS_ASSISTANT_CHANNEL
+      channel: FS_ASSISTANT_CHANNEL,
+    });
+
+    app.client.chat.postMessage({
+      text: "To confirm this appointment please press below buttons: ",
+      thread_ts: postMessageResponse.ts,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `To confirm this appointment please press below buttons:  `,
+          },
+        },
+        {
+          type: "actions",
+          elements: [
+            {
+              type: "button",
+              text: {
+                type: "plain_text",
+                text: "Yes",
+                emoji: true,
+              },
+              action_id: "button_yes_click",
+            },
+            {
+              type: "button",
+              text: {
+                type: "plain_text",
+                text: "No",
+                emoji: true,
+              },
+              action_id: "button_no_click",
+            },
+          ],
+        },
+      ],
+      channel: FS_ASSISTANT_CHANNEL,
+    });
+
+    app.action("button_yes_click", async ({ body, ack, say }) => {
+      // Acknowledge the action
+      await ack();
+      await say(`<@${body.user.id}> clicked yes button`);
     });
 
     try {
       const responseTwilio = await twilioClient.messages.create({
         to,
         body,
-        from: TWILIO_NUMBER
+        from: TWILIO_NUMBER,
       });
 
       req.log.info("Twilio message sent", responseTwilio);
@@ -80,14 +133,14 @@ async function StartServer() {
 
     app.client.chat.postMessage({
       text: `response from ${from}: ${body}`,
-      channel: FS_ASSISTANT_CHANNEL
+      channel: FS_ASSISTANT_CHANNEL,
     });
   });
 
   // Just a quick verification than the bot is alive.
   app.message("are you there?", async ({ message, say }) => {
     await say({
-      text: `Yes <@${message.user}>! I am here.`
+      text: `Yes <@${message.user}>! I am here.`,
     });
   });
 
