@@ -6,6 +6,8 @@ steps:
       - "SLACK_SIGNING_SECRET=${_SLACK_SIGNING_SECRET}"
       - "SLACK_BOT_TOKEN=${_SLACK_BOT_TOKEN}"
       - "SLACK_APP_TOKEN=${_SLACK_APP_TOKEN}"
+      - "TWILIO_ACCOUNT_SID=${_TWILIO_ACCOUNT_SID}"
+      - "TWILIO_AUTH_TOKEN=${_TWILIO_AUTH_TOKEN}"
 
   - name: gcr.io/cloud-builders/docker
     args:
