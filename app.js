@@ -45,6 +45,16 @@ receiver.router.post("/schedule-wo", (req, res) => {
   res.end("ok!");
 });
 
+receiver.router.post("/reply", (req, res) => {
+  const from = req.body.from;
+  const body = req.body.msg;
+
+  app.client.chat.postMessage({
+    text: `response from ${from}: ${body}`,
+    channel: FS_ASSISTANT_CHANNEL
+  });
+});
+
 // Listens to incoming messages that contain "hello"
 app.message("hello", async ({ message, say }) => {
   await say({
