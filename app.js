@@ -1,13 +1,20 @@
 require("dotenv").config();
 const { App, ExpressReceiver } = require("@slack/bolt");
 const bodyParser = require("body-parser");
+const bunyan = require("bunyan");
 
 const FS_ASSISTANT_CHANNEL = "C040SH1GX5Z";
 const TWILIO_NUMBER = "+13157582817";
 
+const lb = require("@google-cloud/logging-bunyan");
+const { logger, mw } = await lb.express.middleware({
+  logName: "fs-slack-assistant"
+});
+
 const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_SECRET });
 receiver.router.use(bodyParser.json());
 receiver.router.use(bodyParser.urlencoded({ extended: true }));
+receiver.app.use(mw);
 
 const app = new App({
   receiver,
@@ -20,6 +27,7 @@ const app = new App({
 const twilioClient = new require("twilio")(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 receiver.router.get("/ping", (req, res) => {
+  req.log.info("Ping Request Received");
   res.writeHead(200);
   res.end("Pong!");
 });
@@ -39,7 +47,7 @@ receiver.router.post("/schedule-wo", (req, res) => {
       to,
       from: TWILIO_NUMBER
     })
-    .then((message) => console.log(message.sid));
+    .then((message) => req.log.info("Twilio message sent", message));
 
   res.writeHead(200);
   res.end("ok!");
@@ -87,5 +95,5 @@ app.action("button_click", async ({ body, ack, say }) => {
 
 (async () => {
   await app.start(process.env.PORT || 3000);
-  console.log("Slack Bot FS Assistant is running!");
+  logger.info("Slack Bot FS Assistant is running!");
 })();

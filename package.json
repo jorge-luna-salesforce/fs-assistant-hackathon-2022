@@ -14,8 +14,10 @@
   "author": "FS Resource Teams - Hackathon 2022",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/logging-bunyan": "^4.1.2",
     "@slack/bolt": "^3.12.1",
     "body-parser": "^1.20.0",
+    "bunyan": "^1.8.15",
     "dotenv": "^16.0.2",
     "twilio": "^3.81.0"
   }
