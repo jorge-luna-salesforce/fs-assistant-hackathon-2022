@@ -14,7 +14,7 @@ async function StartServer() {
   const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_SECRET });
   receiver.router.use(bodyParser.json());
   receiver.router.use(bodyParser.urlencoded({ extended: true }));
-  //receiver.app.use(mw);
+  receiver.app.use(mw);
 
   const app = new App({
     receiver,
