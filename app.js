@@ -9,8 +9,8 @@ const TWILIO_NUMBER = "+13157582817";
 async function StartServer() {
   const { logger, mw } = await logBunyan.express.middleware({
     logName: "fs-slack-assistant",
-    projectId: "fsl-hackathon-2022",
-    keyFilename: "fsl-hackathon-2022-55239864ff67.json",
+    projectId: process.env.NODE_ENV === "production" ? undefined : "fsl-hackathon-2022",
+    keyFilename: process.env.NODE_ENV === "production" ? undefined : "key/fsl-hackathon-2022-639f41b28317.json",
     redirectToStdout: true
   });
 
