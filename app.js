@@ -14,7 +14,7 @@ async function StartServer() {
   const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_SECRET });
   receiver.router.use(bodyParser.json());
   receiver.router.use(bodyParser.urlencoded({ extended: true }));
-  receiver.app.use(mw);
+  //receiver.app.use(mw);
 
   const app = new App({
     receiver,
@@ -41,13 +41,13 @@ async function StartServer() {
       channel: FS_ASSISTANT_CHANNEL
     });
 
-    const message = await twilioClient.messages.create(to, {
+    const responseTwilio = await twilioClient.messages.create({
+      to,
+      body,
       from: TWILIO_NUMBER
     });
 
-    const retValue = message.say(body);
-
-    req.log.info("Twilio message sent", retValue);
+    req.log.info("Twilio message sent", responseTwilio);
     res.writeHead(200);
     res.end("ok!");
   });
