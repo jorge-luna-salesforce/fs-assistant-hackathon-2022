@@ -153,7 +153,7 @@ async function StartServer() {
     //   thread_ts: threadId
     // });
     await ack();
-    onAcceptAppointment({ number, appointmentId, threadId });
+    //onAcceptAppointment({ number, appointmentId, threadId });
   });
 
   app.action("button_no_click", async ({ body, ack, say }) => {
@@ -169,7 +169,7 @@ async function StartServer() {
     //   thread_ts: threadId
     // });
     await ack();
-    onDeclineAppointment({ number, appointmentId, threadId });
+    //onDeclineAppointment({ number, appointmentId, threadId });
   });
 
   const onAcceptAppointment = async ({ number, appointmentId, threadId }) => {
