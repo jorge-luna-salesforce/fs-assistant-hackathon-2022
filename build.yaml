@@ -8,6 +8,7 @@ steps:
       - "SLACK_APP_TOKEN=${_SLACK_APP_TOKEN}"
       - "TWILIO_ACCOUNT_SID=${_TWILIO_ACCOUNT_SID}"
       - "TWILIO_AUTH_TOKEN=${_TWILIO_AUTH_TOKEN}"
+      - "SF_AUTH_TOKEN"=${_SF_AUTH_TOKEN}
 
   - name: gcr.io/cloud-builders/docker
     args:
