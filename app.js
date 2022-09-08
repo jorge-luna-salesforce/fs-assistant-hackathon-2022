@@ -192,7 +192,7 @@ async function StartServer() {
   const onDeclineAppointment = async ({ number, appointmentId, threadId }) => {
     if (appointmentId) {
       const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Declined By Technician`);
-      if (statusUpdateResp === "Success") {
+      if (statusUpdateResp.status === "Success") {
         await app.client.chat.postMessage({
           channel: FS_ASSISTANT_CHANNEL,
           text: `Technician with ph #${number} has declined appointment #${appointmentId}`,
