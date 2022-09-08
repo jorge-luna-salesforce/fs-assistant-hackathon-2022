@@ -7,6 +7,7 @@ const { slackMessageCreator, slackAcceptanceReplyCreator, smsMessageCreator, tin
 const FS_ASSISTANT_CHANNEL = "C040SH1GX5Z";
 const TWILIO_NUMBER = "+13157582817";
 const BASE_URL = "https://fsl-hackathon-2022.uc.r.appspot.com";
+const SF_INSTANCE_URL = `https://brave-raccoon-k687wz-dev-ed.my.salesforce.com/services/apexrest/Appointment/`;
 
 async function StartServer() {
   const { logger, mw } = await logBunyan.express.middleware({
@@ -128,10 +129,10 @@ async function StartServer() {
     try {
       if (answer === "ACCEPT") {
         // technician has accepted appointment
-        onAcceptAppointment({ number, threadId, appointmentId });
+        await onAcceptAppointment({ number, threadId, appointmentId });
       } else {
         // technician has declined appointment
-        onDeclineAppointment({ number, threadId, appointmentId });
+        await onDeclineAppointment({ number, threadId, appointmentId });
       }
 
       res.status(200).end("Success!");
@@ -150,7 +151,7 @@ async function StartServer() {
       thread_ts: payload.threadId
     });
     await ack();
-    onAcceptAppointment(payload);
+    await onAcceptAppointment(payload);
   });
 
   app.action("button_no_click", async ({ body, ack, say }) => {
@@ -163,7 +164,7 @@ async function StartServer() {
       thread_ts: payload.threadId
     });
     await ack();
-    onDeclineAppointment(payload);
+    await onDeclineAppointment(payload);
   });
 
   const onAcceptAppointment = async ({ number, appointmentId, threadId }) => {
@@ -172,6 +173,10 @@ async function StartServer() {
       text: `Technician with ph #${number} has accepted appointment #${appointmentId}`,
       thread_ts: threadId
     });
+    if (appointmentId) {
+      const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Accepted By Technician`);
+      logger.info("Status update response : ", statusUpdateResp);
+    }
 
     logger.info("Appointment Accepted!");
   };
@@ -179,11 +184,38 @@ async function StartServer() {
   const onDeclineAppointment = async ({ number, appointmentId, threadId }) => {
     const slackMessageResponse = await app.client.chat.postMessage({
       channel: FS_ASSISTANT_CHANNEL,
-      text: `Technician with ph #${number} has accepted appointment #${appointmentId}`,
+      text: `Technician with ph #${number} has declined appointment #${appointmentId}`,
       thread_ts: threadId
     });
+    if (appointmentId) {
+      const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Declined By Technician`);
+      logger.info("Status update response : ", statusUpdateResp);
+    }
 
     logger.info("Appointment Declined!");
+  };
+
+  const updateAppointmentStatus = async (appointmentId, appointmentStatus) => {
+    logger.info(`Inside updateAppointmentStatus`);
+    const headers = {
+      Authorization: "Bearer " + process.env.SF_AUTH_TOKEN,
+      "Content-Type": "application/json"
+    };
+
+    try {
+      const requestBody = { id: appointmentId, status: appointmentStatus };
+      const body = JSON.stringify(requestBody);
+      const response = await fetch(SF_INSTANCE_URL, {
+        method: "PATCH",
+        headers,
+        body
+      });
+      const resp = await response.json();
+      logger.info("Status update response : ", resp);
+      return resp;
+    } catch (err) {
+      logger.error("Appointment status update failed.", err);
+    }
   };
 
   // Just a quick verification than the bot is alive.
