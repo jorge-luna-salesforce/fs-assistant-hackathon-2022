@@ -169,29 +169,51 @@ async function StartServer() {
   });
 
   const onAcceptAppointment = async ({ number, appointmentId, threadId }) => {
+    if (appointmentId) {
+      try {
+        const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Accepted By Technician`);
+        logger.info("Status update response : ", statusUpdateResp);
+      } catch (error) {
+        logger.error("Cannot update status!", statusUpdateResp);
+        const slackMessageResponse = await app.client.chat.postMessage({
+          channel: FS_ASSISTANT_CHANNEL,
+          text: `Cannot update status!`,
+          thread_ts: threadId
+        });
+        return;
+      }
+    }
+
     const slackMessageResponse = await app.client.chat.postMessage({
       channel: FS_ASSISTANT_CHANNEL,
       text: `Technician with ph #${number} has accepted appointment #${appointmentId}`,
       thread_ts: threadId
     });
-    if (appointmentId) {
-      const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Accepted By Technician`);
-      logger.info("Status update response : ", statusUpdateResp);
-    }
 
     logger.info("Appointment Accepted!");
   };
 
   const onDeclineAppointment = async ({ number, appointmentId, threadId }) => {
+    if (appointmentId) {
+      try {
+        const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Declined By Technician`);
+        logger.info("Status update response : ", statusUpdateResp);
+      } catch (error) {
+        logger.error("Cannot update status!", statusUpdateResp);
+        const slackMessageResponse = await app.client.chat.postMessage({
+          channel: FS_ASSISTANT_CHANNEL,
+          text: `Cannot update status!`,
+          thread_ts: threadId
+        });
+        return;
+      }
+    }
+
     const slackMessageResponse = await app.client.chat.postMessage({
       channel: FS_ASSISTANT_CHANNEL,
       text: `Technician with ph #${number} has declined appointment #${appointmentId}`,
       thread_ts: threadId
     });
-    if (appointmentId) {
-      const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Declined By Technician`);
-      logger.info("Status update response : ", statusUpdateResp);
-    }
 
     logger.info("Appointment Declined!");
   };
@@ -213,9 +235,13 @@ async function StartServer() {
       });
       const resp = await response.json();
       logger.info("Status update response : ", resp);
+      if (resp.status !== "Success") {
+        throw new Error("Error updating status: ", JSON.stringify(resp));
+      }
       return resp;
     } catch (err) {
       logger.error("Appointment status update failed.", err);
+      throw err;
     }
   };
 
