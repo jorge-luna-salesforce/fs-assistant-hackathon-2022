@@ -170,52 +170,44 @@ async function StartServer() {
 
   const onAcceptAppointment = async ({ number, appointmentId, threadId }) => {
     if (appointmentId) {
-      try {
-        const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Accepted By Technician`);
-        logger.info("Status update response : ", statusUpdateResp);
-      } catch (error) {
-        logger.error("Cannot update status!", error);
+      const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Accepted By Technician`);
+      if (statusUpdateResp.status === "Success") {
+        await app.client.chat.postMessage({
+          channel: FS_ASSISTANT_CHANNEL,
+          text: `Technician with ph #${number} has accepted appointment #${appointmentId}`,
+          thread_ts: threadId
+        });
+        logger.info("Appointment Accepted!");
+      } else {
         await app.client.chat.postMessage({
           channel: FS_ASSISTANT_CHANNEL,
           text: `Cannot update status!`,
           thread_ts: threadId
         });
-        return;
+        logger.info("Cannot Accept Appointment!");
       }
     }
-
-    await app.client.chat.postMessage({
-      channel: FS_ASSISTANT_CHANNEL,
-      text: `Technician with ph #${number} has accepted appointment #${appointmentId}`,
-      thread_ts: threadId
-    });
-
-    logger.info("Appointment Accepted!");
   };
 
   const onDeclineAppointment = async ({ number, appointmentId, threadId }) => {
     if (appointmentId) {
-      try {
-        const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Declined By Technician`);
-        logger.info("Status update response : ", statusUpdateResp);
-      } catch (error) {
-        logger.error("Cannot update status!", error);
+      const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Declined By Technician`);
+      if (statusUpdateResp === "Success") {
+        await app.client.chat.postMessage({
+          channel: FS_ASSISTANT_CHANNEL,
+          text: `Technician with ph #${number} has declined appointment #${appointmentId}`,
+          thread_ts: threadId
+        });
+        logger.info("Appointment Declined!");
+      } else {
         await app.client.chat.postMessage({
           channel: FS_ASSISTANT_CHANNEL,
           text: `Cannot update status!`,
           thread_ts: threadId
         });
-        return;
+        logger.info("Cannot Decline Appointment!");
       }
     }
-
-    await app.client.chat.postMessage({
-      channel: FS_ASSISTANT_CHANNEL,
-      text: `Technician with ph #${number} has declined appointment #${appointmentId}`,
-      thread_ts: threadId
-    });
-
-    logger.info("Appointment Declined!");
   };
 
   const updateAppointmentStatus = async (appointmentId, appointmentStatus) => {
@@ -225,7 +217,6 @@ async function StartServer() {
       "Content-Type": "application/json"
     };
 
-    let resp = {};
     try {
       const requestBody = { id: appointmentId, status: appointmentStatus };
       const body = JSON.stringify(requestBody);
@@ -234,17 +225,13 @@ async function StartServer() {
         headers,
         body
       });
-      resp = await response.json();
+      const resp = await response.json();
       logger.info("Status update response : ", resp);
+      return resp;
     } catch (err) {
       logger.error("Appointment status update failed.", err);
       throw err;
     }
-
-    if (resp.status !== "Success") {
-      throw new Error("Error updating status: ", JSON.stringify(resp));
-    }
-    return resp;
   };
 
   // Just a quick verification than the bot is alive.
