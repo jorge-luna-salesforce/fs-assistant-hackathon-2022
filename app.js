@@ -143,25 +143,25 @@ async function StartServer() {
   app.action("button_yes_click", async ({ body, ack, say }) => {
     // Acknowledge the action
     logger.debug("'Yes' button clicked", body);
-    const payload = JSON.parse(body.actions.value);
-    const number = payload.number;
-    const appointmentId = payload.appointmentId;
-    const threadId = payload.threadId;
+    // const payload = JSON.parse(body.actions.value);
+    // const number = payload.number;
+    // const appointmentId = payload.appointmentId;
+    // const threadId = payload.threadId;
 
     await ack();
-    onAcceptAppointment({ number, appointmentId, threadId });
+    // onAcceptAppointment({ number, appointmentId, threadId });
   });
 
   app.action("button_no_click", async ({ body, ack, say }) => {
     // Acknowledge the action
     logger.debug("'No' button clicked", body);
-    const payload = JSON.parse(body.actions.value);
-    const number = payload.number;
-    const appointmentId = payload.appointmentId;
-    const threadId = payload.threadId;
+    // const payload = JSON.parse(body.actions.value);
+    // const number = payload.number;
+    // const appointmentId = payload.appointmentId;
+    // const threadId = payload.threadId;
 
     await ack();
-    onDeclineAppointment({ number, appointmentId, threadId });
+    // onDeclineAppointment({ number, appointmentId, threadId });
   });
 
   const onAcceptAppointment = async ({ number, appointmentId, threadId }) => {
