@@ -1,8 +1,9 @@
+import fetch from "node-fetch";
+
 require("dotenv").config();
 const { App, ExpressReceiver } = require("@slack/bolt");
 const bodyParser = require("body-parser");
 const logBunyan = require("@google-cloud/logging-bunyan");
-const fetch = require("node-fetch");
 const { slackMessageCreator, slackAcceptanceReplyCreator, smsMessageCreator, tinifyURL } = require("./util/templateFunctions");
 
 const FS_ASSISTANT_CHANNEL = "C040SH1GX5Z";
