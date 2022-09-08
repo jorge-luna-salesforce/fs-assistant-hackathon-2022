@@ -142,7 +142,7 @@ async function StartServer() {
 
   app.action("button_yes_click", async ({ body, ack, say }) => {
     // Acknowledge the action
-
+    logger.debug("'Yes' button clicked", body);
     const payload = JSON.parse(body.actions.value);
     const number = payload.number;
     const appointmentId = payload.appointmentId;
@@ -154,6 +154,7 @@ async function StartServer() {
 
   app.action("button_no_click", async ({ body, ack, say }) => {
     // Acknowledge the action
+    logger.debug("'No' button clicked", body);
     const payload = JSON.parse(body.actions.value);
     const number = payload.number;
     const appointmentId = payload.appointmentId;
