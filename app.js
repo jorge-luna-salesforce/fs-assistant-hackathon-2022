@@ -142,7 +142,10 @@ async function StartServer() {
 
   app.action("button_yes_click", async ({ body, ack, say }) => {
     // Acknowledge the action
-    logger.info("'Yes' button clicked", body.message.blocks.filter((b) => b.type === "actions").elements);
+    logger.info(
+      "'Yes' button clicked",
+      body.message.blocks.filter((b) => b.type === "actions")
+    );
     // const payload = JSON.parse(body.message.actions[0].value);
     // const number = payload.number;
     // const appointmentId = payload.appointmentId;
@@ -158,7 +161,10 @@ async function StartServer() {
 
   app.action("button_no_click", async ({ body, ack, say }) => {
     // Acknowledge the action
-    logger.info("'Yes' button clicked", body.message.blocks.filter((b) => b.type === "actions").elements);
+    logger.info(
+      "'No' button clicked",
+      body.message.blocks.filter((b) => b.type === "actions")
+    );
     // const payload = JSON.parse(body.message.actions[0].value);
     // const number = payload.number;
     // const appointmentId = payload.appointmentId;
