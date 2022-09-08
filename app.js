@@ -225,6 +225,7 @@ async function StartServer() {
       "Content-Type": "application/json"
     };
 
+    let resp = {};
     try {
       const requestBody = { id: appointmentId, status: appointmentStatus };
       const body = JSON.stringify(requestBody);
@@ -233,16 +234,17 @@ async function StartServer() {
         headers,
         body
       });
-      const resp = await response.json();
+      resp = await response.json();
       logger.info("Status update response : ", resp);
-      if (resp.status !== "Success") {
-        throw new Error("Error updating status: ", JSON.stringify(resp));
-      }
-      return resp;
     } catch (err) {
       logger.error("Appointment status update failed.", err);
       throw err;
     }
+
+    if (resp.status !== "Success") {
+      throw new Error("Error updating status: ", JSON.stringify(resp));
+    }
+    return resp;
   };
 
   // Just a quick verification than the bot is alive.
