@@ -174,8 +174,8 @@ async function StartServer() {
         const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Accepted By Technician`);
         logger.info("Status update response : ", statusUpdateResp);
       } catch (error) {
-        logger.error("Cannot update status!", statusUpdateResp);
-        const slackMessageResponse = await app.client.chat.postMessage({
+        logger.error("Cannot update status!", error);
+        await app.client.chat.postMessage({
           channel: FS_ASSISTANT_CHANNEL,
           text: `Cannot update status!`,
           thread_ts: threadId
@@ -184,7 +184,7 @@ async function StartServer() {
       }
     }
 
-    const slackMessageResponse = await app.client.chat.postMessage({
+    await app.client.chat.postMessage({
       channel: FS_ASSISTANT_CHANNEL,
       text: `Technician with ph #${number} has accepted appointment #${appointmentId}`,
       thread_ts: threadId
@@ -199,8 +199,8 @@ async function StartServer() {
         const statusUpdateResp = await updateAppointmentStatus(appointmentId, `Declined By Technician`);
         logger.info("Status update response : ", statusUpdateResp);
       } catch (error) {
-        logger.error("Cannot update status!", statusUpdateResp);
-        const slackMessageResponse = await app.client.chat.postMessage({
+        logger.error("Cannot update status!", error);
+        await app.client.chat.postMessage({
           channel: FS_ASSISTANT_CHANNEL,
           text: `Cannot update status!`,
           thread_ts: threadId
@@ -209,7 +209,7 @@ async function StartServer() {
       }
     }
 
-    const slackMessageResponse = await app.client.chat.postMessage({
+    await app.client.chat.postMessage({
       channel: FS_ASSISTANT_CHANNEL,
       text: `Technician with ph #${number} has declined appointment #${appointmentId}`,
       thread_ts: threadId
