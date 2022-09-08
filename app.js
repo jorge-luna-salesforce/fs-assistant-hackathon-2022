@@ -144,34 +144,26 @@ async function StartServer() {
     // Acknowledge the action
     const payload = JSON.parse(body.message.blocks.filter((b) => b.type === "actions")[0].elements[0].value);
     logger.info("'Yes' button clicked", payload);
-    // const payload = JSON.parse(body.message.actions[0].value);
-    // const number = payload.number;
-    // const appointmentId = payload.appointmentId;
-    // const threadId = payload.threadId;
-    // await say({
-    //   text: "ok!",
-    //   channel: FS_ASSISTANT_CHANNEL,
-    //   thread_ts: threadId
-    // });
+    await say({
+      text: "ok!",
+      channel: FS_ASSISTANT_CHANNEL,
+      thread_ts: payload.threadId
+    });
     await ack();
-    //onAcceptAppointment({ number, appointmentId, threadId });
+    onAcceptAppointment(payload);
   });
 
   app.action("button_no_click", async ({ body, ack, say }) => {
     // Acknowledge the action
     const payload = JSON.parse(body.message.blocks.filter((b) => b.type === "actions")[0].elements[0].value);
     logger.info("'No' button clicked", payload);
-    // const payload = JSON.parse(body.message.actions[0].value);
-    // const number = payload.number;
-    // const appointmentId = payload.appointmentId;
-    // const threadId = payload.threadId;
-    // await say({
-    //   text: "ok!",
-    //   channel: FS_ASSISTANT_CHANNEL,
-    //   thread_ts: threadId
-    // });
+    await say({
+      text: "ok!",
+      channel: FS_ASSISTANT_CHANNEL,
+      thread_ts: payload.threadId
+    });
     await ack();
-    //onDeclineAppointment({ number, appointmentId, threadId });
+    onDeclineAppointment(payload);
   });
 
   const onAcceptAppointment = async ({ number, appointmentId, threadId }) => {
