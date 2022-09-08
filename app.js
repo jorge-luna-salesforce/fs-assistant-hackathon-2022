@@ -227,7 +227,7 @@ async function StartServer() {
       });
       const resp = await response.json();
       logger.info("Status update response : ", resp);
-      return resp;
+      return JSON.parse(resp);
     } catch (err) {
       logger.error("Appointment status update failed.", err);
       throw err;
