@@ -2,9 +2,11 @@ require("dotenv").config();
 const { App, ExpressReceiver } = require("@slack/bolt");
 const bodyParser = require("body-parser");
 const logBunyan = require("@google-cloud/logging-bunyan");
+const { slackMessageCreator, slackAcceptanceReplyCreator, smsMessageCreator, tinifyURL } = require("./util/templateFunctions");
 
 const FS_ASSISTANT_CHANNEL = "C040SH1GX5Z";
 const TWILIO_NUMBER = "+13157582817";
+const BASE_URL = "https://fsl-hackathon-2022.uc.r.appspot.com";
 
 async function StartServer() {
   const { logger, mw } = await logBunyan.express.middleware({
@@ -45,69 +47,65 @@ async function StartServer() {
       return;
     }
 
-    const message = req.body[0];
-    const to = message.phoneNumber;
-    const body = `>Appointment scheduled for : ${message.name} \n
-                  Phone #: ${message.phoneNumber}\n
-                  Description: ${message.appointment.subject}\n
-                  Starting at:${message.appointment.startTime} - Ending at: ${message.appointment.endTime}\n
-                  Address: ${message.appointment.address.street} - ${message.appointment.address.city} - ${message.appointment.address.state} - ${message.appointment.address.postalCode} - ${message.appointment.address.country}\n
-                  Appointment Id: ${message.appointment.appointmentId}`;
-
-    const postMessageResponse = await app.client.chat.postMessage({
-      text: body,
-      channel: FS_ASSISTANT_CHANNEL
-    });
-
-    app.client.chat.postMessage({
-      text: "To confirm this appointment please press below buttons: ",
-      thread_ts: postMessageResponse.ts,
-      blocks: [
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `To confirm this appointment please press below buttons:  `
-          }
-        },
-        {
-          type: "actions",
-          elements: [
-            {
-              type: "button",
-              text: {
-                type: "plain_text",
-                text: "Yes",
-                emoji: true
-              },
-              action_id: "button_yes_click"
-            },
-            {
-              type: "button",
-              text: {
-                type: "plain_text",
-                text: "No",
-                emoji: true
-              },
-              action_id: "button_no_click"
-            }
-          ]
-        }
-      ],
-      channel: FS_ASSISTANT_CHANNEL
-    });
-
-    app.action("button_yes_click", async ({ body, ack, say }) => {
-      // Acknowledge the action
-      logger.info("Button Yes Clicked!", body);
-      await ack();
-      await say(`<@${body.user.id}> clicked yes button`);
-    });
-
     try {
+      const message = req.body[0];
+      const name = message.name;
+      const number = message.phoneNumber;
+      const description = message.appointment.subject;
+      const startTime = message.appointment.startTime;
+      const endTime = message.appointment.endTime;
+      const address = `${message.appointment.address.street} - ${message.appointment.address.city} - ${message.appointment.address.state} - ${message.appointment.address.postalCode} - ${message.appointment.address.country}`;
+      const appointmentId = message.appointment.appointmentId;
+
+      // Construct the original slack post to be sent to the channel
+      const slackMessageBody = slackMessageCreator({
+        name,
+        description,
+        startTime,
+        endTime,
+        address,
+        appointmentId
+      });
+
+      const slackMessageResponse = await app.client.chat.postMessage({
+        ...slackMessageBody,
+        channel: FS_ASSISTANT_CHANNEL
+      });
+
+      const slackThreadID = slackMessageResponse.ts;
+
+      // Construct the Accept/Decline buttons that will appear in the thread below the original post
+      const slackAcceptanceButtons = slackAcceptanceReplyCreator({
+        number,
+        appointmentId,
+        threadId: slackThreadID
+      });
+
+      app.client.chat.postMessage({
+        ...slackAcceptanceButtons,
+        channel: FS_ASSISTANT_CHANNEL,
+        thread_ts: slackThreadID
+      });
+
+      // Construct the SMS Message and Accept/Decline Links
+      const acceptURL = await tinifyURL(`${BASE_URL}/reply?appointmentId=${appointmentId}&number=${number}&threadId=${slackThreadID}&answer=ACCEPT`);
+      const declineURL = await tinifyURL(
+        `${BASE_URL}/reply?appointmentId=${appointmentId}&number=${number}&threadId=${slackThreadID}&answer=DECLINE`
+      );
+
+      const smsMessageBody = smsMessageCreator({
+        description,
+        startTime,
+        endTime,
+        address,
+        appointmentId,
+        acceptURL,
+        declineURL
+      });
+
       const responseTwilio = await twilioClient.messages.create({
-        to,
-        body,
+        to: number,
+        body: smsMessageBody,
         from: TWILIO_NUMBER
       });
 
@@ -117,19 +115,73 @@ async function StartServer() {
     } catch (error) {
       req.log.error("Error sending to Twilio", error);
       res.writeHead(400);
-      res.end("Error sending message");
+      res.end("Error sending message:", error);
     }
   });
 
-  receiver.router.post("/reply", (req, res) => {
-    const from = req.body.from;
-    const body = req.body.msg;
+  receiver.router.get("/reply", async (req, res) => {
+    const number = req.query.number;
+    const threadId = req.query.threadId;
+    const appointmentId = req.query.appointmentId;
+    const answer = req.query.answer;
 
-    app.client.chat.postMessage({
-      text: `response from ${from}: ${body}`,
-      channel: FS_ASSISTANT_CHANNEL
-    });
+    try {
+      if (answer === "ACCEPT") {
+        // technician has accepted appointment
+        onAcceptAppointment({ number, threadId, appointmentId });
+      } else {
+        // technician has declined appointment
+        onDeclineAppointment({ number, threadId, appointmentId });
+      }
+
+      res.status(200).end("Success!");
+    } catch (error) {
+      res.status(400).end("Error receiving message");
+    }
   });
+
+  app.action("button_yes_click", async ({ body, ack, say }) => {
+    // Acknowledge the action
+
+    const payload = JSON.parse(body.actions.value);
+    const number = payload.number;
+    const appointmentId = payload.appointmentId;
+    const threadId = payload.threadId;
+
+    await ack();
+    onAcceptAppointment({ number, appointmentId, threadId });
+  });
+
+  app.action("button_no_click", async ({ body, ack, say }) => {
+    // Acknowledge the action
+    const payload = JSON.parse(body.actions.value);
+    const number = payload.number;
+    const appointmentId = payload.appointmentId;
+    const threadId = payload.threadId;
+
+    await ack();
+    onDeclineAppointment({ number, appointmentId, threadId });
+  });
+
+  const onAcceptAppointment = async ({ number, appointmentId, threadId }) => {
+    const slackMessageResponse = await app.client.chat.postMessage({
+      channel: FS_ASSISTANT_CHANNEL,
+      text: `Technician with ph #${number} has accepted appointment #${appointmentId}`,
+      thread_ts: threadId
+    });
+
+    logger.info("Appointment Accepted!");
+  };
+
+  const onDeclineAppointment = async ({ number, appointmentId, threadId }) => {
+    const slackMessageResponse = await app.client.chat.postMessage({
+      channel: FS_ASSISTANT_CHANNEL,
+      text: `Technician with ph #${number} has accepted appointment #${appointmentId}`,
+      thread_ts: threadId
+    });
+
+    logger.info("Appointment Declined!");
+  };
 
   // Just a quick verification than the bot is alive.
   app.message("are you there?", async ({ message, say }) => {
